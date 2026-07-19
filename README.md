@@ -19,9 +19,8 @@ npm run build
 
 The static export is written to `out/`. The editable project-page source lives
 on the `website` branch, while GitHub Pages serves the compiled contents of the
-`gh-pages` branch. Pushes to `website` run a build check through
-`.github/workflows/deploy.yml`; publishing remains a separate update to
-`gh-pages`.
+`gh-pages` branch. Run the build locally before publishing, then update
+`gh-pages` with the contents of `out/`.
 
 ## Content
 
