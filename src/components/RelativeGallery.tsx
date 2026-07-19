@@ -54,7 +54,16 @@ export default function RelativeGallery() {
   const sample = samples[index];
 
   useEffect(() => {
-    thumbnails.current[index]?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    const thumbnail = thumbnails.current[index];
+    const track = thumbnail?.parentElement;
+    if (thumbnail && track) {
+      const thumbnailRect = thumbnail.getBoundingClientRect();
+      const trackRect = track.getBoundingClientRect();
+      track.scrollTo({
+        left: track.scrollLeft + thumbnailRect.left - trackRect.left - (track.clientWidth - thumbnailRect.width) / 2,
+        behavior: "smooth"
+      });
+    }
     setPosition(50);
   }, [index]);
 

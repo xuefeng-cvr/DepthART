@@ -50,7 +50,16 @@ export default function RelativeVideoGallery() {
     const start = window.setTimeout(() => {
       Promise.allSettled([rgb.play(), depth.play()]).then(() => setIsPlaying(!rgb.paused));
     }, 80);
-    thumbnails.current[index]?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    const thumbnail = thumbnails.current[index];
+    const track = thumbnail?.parentElement;
+    if (thumbnail && track) {
+      const thumbnailRect = thumbnail.getBoundingClientRect();
+      const trackRect = track.getBoundingClientRect();
+      track.scrollTo({
+        left: track.scrollLeft + thumbnailRect.left - trackRect.left - (track.clientWidth - thumbnailRect.width) / 2,
+        behavior: "smooth"
+      });
+    }
     return () => window.clearTimeout(start);
   }, [index]);
 
