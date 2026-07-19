@@ -3,7 +3,6 @@ name: Build project page
 on:
   push:
     branches: ["website"]
-  workflow_dispatch:
 
 permissions:
   contents: read
