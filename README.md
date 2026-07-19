@@ -17,9 +17,10 @@ The site uses `/DepthART` as its default base path, matching the GitHub Pages UR
 npm run build
 ```
 
-The static export is written to `out/`. The workflow in
-`.github/workflows/deploy.yml` builds and publishes it to GitHub Pages whenever
-`main` is updated.
+The static export is written to `out/`. GitHub Pages currently serves the
+contents of the `gh-pages` branch. An Actions-based deployment workflow is kept
+in `.github/workflows/deploy.yml` for future use, but it must be enabled in the
+repository before it will run.
 
 ## Content
 
