@@ -1,4 +1,4 @@
-# DepthART Project Page
+# DepthART Project Page Source
 
 Official project page for **DepthART: Depth Anything Rethought for Tiny Models**.
 
@@ -17,10 +17,11 @@ The site uses `/DepthART` as its default base path, matching the GitHub Pages UR
 npm run build
 ```
 
-The static export is written to `out/`. GitHub Pages currently serves the
-contents of the `gh-pages` branch. An Actions-based deployment workflow is kept
-in `.github/workflows/deploy.yml` for future use, but it must be enabled in the
-repository before it will run.
+The static export is written to `out/`. The editable project-page source lives
+on the `website` branch, while GitHub Pages serves the compiled contents of the
+`gh-pages` branch. Pushes to `website` run a build check through
+`.github/workflows/deploy.yml`; publishing remains a separate update to
+`gh-pages`.
 
 ## Content
 

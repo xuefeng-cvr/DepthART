@@ -1,17 +1,15 @@
-name: Deploy to GitHub Pages
+name: Build project page
 
 on:
   push:
-    branches: ["main"]
+    branches: ["website"]
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: "pages"
+  group: "website-build"
   cancel-in-progress: true
 
 env:
@@ -32,18 +30,3 @@ jobs:
         run: npm ci
       - name: Build static site
         run: npm run build
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./out
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
