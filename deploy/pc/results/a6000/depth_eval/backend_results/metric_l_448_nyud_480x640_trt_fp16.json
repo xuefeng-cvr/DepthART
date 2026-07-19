@@ -1,0 +1,30 @@
+{
+  "family": "metric",
+  "encoder": "L",
+  "nominal_resolution": 448,
+  "input_shape": [
+    480,
+    640
+  ],
+  "dataset": "NYUD",
+  "mode": "trt_fp16",
+  "backend": "TensorRT FP16",
+  "checkpoint": "checkpoints/metric/depthart_metric_indoor_l_448.pth",
+  "checkpoint_domain": "indoor",
+  "engine": "a6000_generated_artifacts_not_included/metric_l_448_nyud_480x640_trt_fp16.engine",
+  "plugin": "a6000_generated_artifacts_not_included/libdepthart_selective_scan_trt_sm86.so",
+  "parameter_sha256": null,
+  "evaluation": "metric depth without alignment",
+  "samples": 654,
+  "metrics": {
+    "d1": 0.9438794712772428,
+    "d2": 0.9937240326441027,
+    "d3": 0.9988517439511209,
+    "abs_rel": 0.08548785843644348,
+    "sq_rel": 0.035808575604842914,
+    "rmse": 0.30063745528687397,
+    "rmse_log": 0.10522625562578257,
+    "log10": 0.03611056689409374,
+    "silog": 0.09366880639795135
+  }
+}

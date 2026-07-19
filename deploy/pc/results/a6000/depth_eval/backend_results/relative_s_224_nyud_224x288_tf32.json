@@ -1,0 +1,30 @@
+{
+  "family": "relative",
+  "encoder": "S",
+  "nominal_resolution": 224,
+  "input_shape": [
+    224,
+    288
+  ],
+  "dataset": "NYUD",
+  "mode": "tf32",
+  "backend": "PyTorch TF32 + custom SelectiveScan",
+  "checkpoint": "checkpoints/relative/depthart_relative_s_224.pth",
+  "checkpoint_domain": "relative",
+  "engine": null,
+  "plugin": null,
+  "parameter_sha256": "16171029c12d0d13e3aee4926c10862c1d89b948c0f9820808d88a3355952c90",
+  "evaluation": "affine-invariant disparity scale+shift per image",
+  "samples": 654,
+  "metrics": {
+    "d1": 0.9531150313790148,
+    "d2": 0.987964327479223,
+    "d3": 0.9962853921123229,
+    "abs_rel": 0.06643713769340596,
+    "rmse": 0.2995074017810712,
+    "log10": 0.029033060197003573,
+    "rmse_log": 0.09765400837206877,
+    "silog": 9.735291531549448,
+    "sq_rel": 0.03612529637730988
+  }
+}

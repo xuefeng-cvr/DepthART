@@ -1,0 +1,30 @@
+{
+  "family": "relative",
+  "encoder": "B",
+  "nominal_resolution": 224,
+  "input_shape": [
+    224,
+    736
+  ],
+  "dataset": "KITTI",
+  "mode": "tf32",
+  "backend": "PyTorch TF32 + custom SelectiveScan",
+  "checkpoint": "checkpoints/relative/depthart_relative_b_224.pth",
+  "checkpoint_domain": "relative",
+  "engine": null,
+  "plugin": null,
+  "parameter_sha256": "ae3ee59611f44401ffbed056abb11b8be5fd218d4588bee267393cf0061ceba9",
+  "evaluation": "affine-invariant disparity scale+shift per image",
+  "samples": 652,
+  "metrics": {
+    "d1": 0.9215652762019815,
+    "d2": 0.9856033248897881,
+    "d3": 0.9959020115257157,
+    "abs_rel": 0.09234045705318085,
+    "rmse": 3.8718662144033456,
+    "log10": 0.038561410487749456,
+    "rmse_log": 0.13154480126943507,
+    "silog": 13.1210620339562,
+    "sq_rel": 0.5522098480552389
+  }
+}

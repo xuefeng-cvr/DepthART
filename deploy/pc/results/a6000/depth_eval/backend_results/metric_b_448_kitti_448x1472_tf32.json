@@ -1,0 +1,30 @@
+{
+  "family": "metric",
+  "encoder": "B",
+  "nominal_resolution": 448,
+  "input_shape": [
+    448,
+    1472
+  ],
+  "dataset": "KITTI",
+  "mode": "tf32",
+  "backend": "PyTorch TF32 + custom SelectiveScan",
+  "checkpoint": "checkpoints/metric/depthart_metric_outdoor_b_448.pth",
+  "checkpoint_domain": "outdoor",
+  "engine": null,
+  "plugin": null,
+  "parameter_sha256": "699f1865bcd35678f733f01aa2ba0470151f4e456c1016651df33f0bbb9c64b2",
+  "evaluation": "metric depth without alignment",
+  "samples": 652,
+  "metrics": {
+    "d1": 0.9499316571131806,
+    "d2": 0.9936719994786327,
+    "d3": 0.9987668397784965,
+    "abs_rel": 0.06997518413385913,
+    "sq_rel": 0.2703338100437783,
+    "rmse": 2.946178183233811,
+    "rmse_log": 0.10358387266679958,
+    "log10": 0.030591529525496475,
+    "silog": 0.09946426675523534
+  }
+}

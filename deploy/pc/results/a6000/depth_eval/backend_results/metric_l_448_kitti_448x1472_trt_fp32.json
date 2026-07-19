@@ -1,0 +1,30 @@
+{
+  "family": "metric",
+  "encoder": "L",
+  "nominal_resolution": 448,
+  "input_shape": [
+    448,
+    1472
+  ],
+  "dataset": "KITTI",
+  "mode": "trt_fp32",
+  "backend": "TensorRT FP32",
+  "checkpoint": "checkpoints/metric/depthart_metric_outdoor_l_448.pth",
+  "checkpoint_domain": "outdoor",
+  "engine": "a6000_generated_artifacts_not_included/metric_l_448_kitti_448x1472_trt_fp32.engine",
+  "plugin": "a6000_generated_artifacts_not_included/libdepthart_selective_scan_trt_sm86.so",
+  "parameter_sha256": null,
+  "evaluation": "metric depth without alignment",
+  "samples": 652,
+  "metrics": {
+    "d1": 0.9575667664682939,
+    "d2": 0.994518528321038,
+    "d3": 0.9989945927829099,
+    "abs_rel": 0.06441779697222487,
+    "sq_rel": 0.2333366933330162,
+    "rmse": 2.7640005377538364,
+    "rmse_log": 0.09665499745862433,
+    "log10": 0.028416441050729505,
+    "silog": 0.09209949640340052
+  }
+}

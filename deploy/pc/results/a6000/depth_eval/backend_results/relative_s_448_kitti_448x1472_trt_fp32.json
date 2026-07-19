@@ -1,0 +1,30 @@
+{
+  "family": "relative",
+  "encoder": "S",
+  "nominal_resolution": 448,
+  "input_shape": [
+    448,
+    1472
+  ],
+  "dataset": "KITTI",
+  "mode": "trt_fp32",
+  "backend": "TensorRT FP32",
+  "checkpoint": "checkpoints/relative/depthart_relative_s_448.pth",
+  "checkpoint_domain": "relative",
+  "engine": "a6000_generated_artifacts_not_included/relative_s_448_kitti_448x1472_trt_fp32.engine",
+  "plugin": "a6000_generated_artifacts_not_included/libdepthart_selective_scan_trt_sm86.so",
+  "parameter_sha256": null,
+  "evaluation": "affine-invariant disparity scale+shift per image",
+  "samples": 652,
+  "metrics": {
+    "d1": 0.929704711285406,
+    "d2": 0.9874627146259826,
+    "d3": 0.9968740951449763,
+    "abs_rel": 0.08176117259266277,
+    "rmse": 3.586189611832057,
+    "log10": 0.035011968138324884,
+    "rmse_log": 0.12174239818098172,
+    "silog": 12.12618985787603,
+    "sq_rel": 0.43654304682248574
+  }
+}

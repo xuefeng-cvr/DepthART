@@ -1,0 +1,30 @@
+{
+  "family": "relative",
+  "encoder": "B",
+  "nominal_resolution": 224,
+  "input_shape": [
+    224,
+    288
+  ],
+  "dataset": "NYUD",
+  "mode": "trt_fp32",
+  "backend": "TensorRT FP32",
+  "checkpoint": "checkpoints/relative/depthart_relative_b_224.pth",
+  "checkpoint_domain": "relative",
+  "engine": "a6000_generated_artifacts_not_included/relative_b_224_nyud_224x288_trt_fp32.engine",
+  "plugin": "a6000_generated_artifacts_not_included/libdepthart_selective_scan_trt_sm86.so",
+  "parameter_sha256": null,
+  "evaluation": "affine-invariant disparity scale+shift per image",
+  "samples": 654,
+  "metrics": {
+    "d1": 0.958961674005672,
+    "d2": 0.9899522713178489,
+    "d3": 0.9971217282949081,
+    "abs_rel": 0.062030361879856215,
+    "rmse": 0.28620505769272825,
+    "log10": 0.027090801460104525,
+    "rmse_log": 0.09224440245704002,
+    "silog": 9.199240116798407,
+    "sq_rel": 0.03238987269710225
+  }
+}

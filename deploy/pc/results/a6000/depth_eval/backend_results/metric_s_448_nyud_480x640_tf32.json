@@ -1,0 +1,30 @@
+{
+  "family": "metric",
+  "encoder": "S",
+  "nominal_resolution": 448,
+  "input_shape": [
+    480,
+    640
+  ],
+  "dataset": "NYUD",
+  "mode": "tf32",
+  "backend": "PyTorch TF32 + custom SelectiveScan",
+  "checkpoint": "checkpoints/metric/depthart_metric_indoor_s_448.pth",
+  "checkpoint_domain": "indoor",
+  "engine": null,
+  "plugin": null,
+  "parameter_sha256": "81e0ff168d03b5240074a97913fe0da690ebf6cf4f9367bd4899707cb7a1ce25",
+  "evaluation": "metric depth without alignment",
+  "samples": 654,
+  "metrics": {
+    "d1": 0.9234219676786849,
+    "d2": 0.9896756612015062,
+    "d3": 0.9977835076846843,
+    "abs_rel": 0.09176369657346961,
+    "sq_rel": 0.044504521137483655,
+    "rmse": 0.3352719949677997,
+    "rmse_log": 0.11789848623848563,
+    "log10": 0.03985559228816232,
+    "silog": 0.10582769383884261
+  }
+}
