@@ -49,7 +49,7 @@ export default function Showcase() {
           <div className="hero-actions">
             <a className="button-dark" href={withBasePath("/DepthART-paper.pdf")} target="_blank" rel="noreferrer"><PaperIcon /> Read paper</a>
             <a className="button-light" href="https://github.com/xuefeng-cvr/DepthART" target="_blank" rel="noreferrer"><GitHubIcon /> Code</a>
-            <a className="button-light" href="https://huggingface.co/xuefeng-cvr/DepthART" target="_blank" rel="noreferrer"><Icon>🤗</Icon> Models</a>
+            <a className="button-light" href="https://huggingface.co/Fengxue93/DepthART/tree/main" target="_blank" rel="noreferrer"><Icon>🤗</Icon> Models</a>
           </div>
         </div>
         <div className="kpi-strip" aria-label="DepthART highlights">
