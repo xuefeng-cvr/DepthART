@@ -35,7 +35,7 @@ export default function Showcase() {
             <a href="#metric-point">3D Demo</a>
             <a href="#citation">BibTeX</a>
           </div>
-          <a className="nav-cta" href={withBasePath("/DepthART-paper.pdf")} target="_blank" rel="noreferrer">
+          <a className="nav-cta" href="https://arxiv.org/abs/2607.17099" target="_blank" rel="noreferrer">
             <Icon>↗</Icon> Paper
           </a>
         </nav>
@@ -47,7 +47,7 @@ export default function Showcase() {
           <div className="hero-title-line"><h1>Depth<span className="title-accent">ART</span></h1><span className="hero-venue-tag">ACMMM 2026</span></div>
           <p className="hero-kicker">Scaling Foundation Monocular Depth to Tiny Models</p>
           <div className="hero-actions">
-            <a className="button-dark" href={withBasePath("/DepthART-paper.pdf")} target="_blank" rel="noreferrer"><PaperIcon /> Read paper</a>
+            <a className="button-dark" href="https://arxiv.org/abs/2607.17099" target="_blank" rel="noreferrer"><PaperIcon /> Read paper</a>
             <a className="button-light" href="https://github.com/xuefeng-cvr/DepthART" target="_blank" rel="noreferrer"><GitHubIcon /> Code</a>
             <a className="button-light" href="https://huggingface.co/Fengxue93/DepthART/tree/main" target="_blank" rel="noreferrer"><Icon>🤗</Icon> Models</a>
           </div>
@@ -89,7 +89,7 @@ export default function Showcase() {
         <MetricPointCloud />
 
         <section className="section-card citation" id="citation">
-          <div className="citation-grid"><div><span className="eyebrow">Cite this work</span><h2>DepthART</h2><p>Accepted to ACM Multimedia 2026. The final citation and public model links will be added with the camera-ready release.</p><div className="hero-actions"><a className="button-dark" href={withBasePath("/DepthART-paper.pdf")} target="_blank" rel="noreferrer">Read manuscript</a><a className="button-light" href="https://github.com/xuefeng-cvr/DepthART" target="_blank" rel="noreferrer">GitHub repository</a></div></div><pre>{`@inproceedings{depthart2026,\n  title = {DepthART: Scaling Foundation Monocular Depth to Tiny Models},\n  author = {Feng Xue and Wu Chen and Mingshuai Zhao and Guofeng Zhong and Anlong Ming and Haozhe Wang and Dianqiao Lei and Zhaowen Lin and Haiyang Zhang and Nicu Sebe},\n  booktitle = {ACM Multimedia},\n  year = {2026}\n}`}</pre></div>
+          <div className="citation-grid"><div><span className="eyebrow">Cite this work</span><h2>DepthART</h2><p>Accepted to ACM Multimedia 2026. The final citation and public model links will be added with the camera-ready release.</p><div className="hero-actions"><a className="button-dark" href="https://arxiv.org/abs/2607.17099" target="_blank" rel="noreferrer">Read on arXiv</a><a className="button-light" href="https://github.com/xuefeng-cvr/DepthART" target="_blank" rel="noreferrer">GitHub repository</a></div></div><pre>{`@inproceedings{depthart2026,\n  title = {DepthART: Scaling Foundation Monocular Depth to Tiny Models},\n  author = {Feng Xue and Wu Chen and Mingshuai Zhao and Guofeng Zhong and Anlong Ming and Haozhe Wang and Dianqiao Lei and Zhaowen Lin and Haiyang Zhang and Nicu Sebe},\n  booktitle = {ACM Multimedia},\n  year = {2026}\n}`}</pre></div>
         </section>
       </div>
 
