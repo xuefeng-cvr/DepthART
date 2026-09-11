@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { withBasePath } from "@/lib/basePath";
 
 type Platform = "a6000" | "orin";
@@ -9,7 +9,7 @@ type Precision = "fp32" | "amp" | "trt_fp32" | "trt_fp16";
 type Family = "relative" | "metric";
 type Dataset = "NYUD" | "KITTI";
 type AccuracyMode = "tf32" | "trt_fp32" | "trt_fp16";
-type Encoder = "S" | "B" | "L";
+type Encoder = "S" | "B" | "L" | "MNV4-S" | "MNV4-M" | "MNV4-M-SLIM-SPF";
 
 type BenchmarkRow = {
   family: Family;
@@ -67,8 +67,22 @@ type PlotPoint = ChartDatum & { x: number; y: number };
 const modelColors: Record<Encoder, string> = {
   S: "#ff746a",
   B: "#8d8bff",
-  L: "#4fc5ff"
+  L: "#4fc5ff",
+  "MNV4-S": "#54d69b",
+  "MNV4-M": "#ffc857",
+  "MNV4-M-SLIM-SPF": "#f58bd7"
 };
+
+const encoderLabels: Record<Encoder, string> = {
+  S: "TinyViM-S",
+  B: "TinyViM-B",
+  L: "TinyViM-L",
+  "MNV4-S": "MobileNetV4-S",
+  "MNV4-M": "MobileNetV4-M",
+  "MNV4-M-SLIM-SPF": "MobileNetV4-M-slim-SPF"
+};
+
+const encoderOrder = Object.keys(encoderLabels) as Encoder[];
 
 const baselineColors: Record<string, string> = {
   MiDaS: "#9aa9bd",
@@ -78,7 +92,10 @@ const baselineColors: Record<string, string> = {
   ZoeDepth: "#ffc75f",
   "MoGe-v2": "#45d5d0",
   "Metric3D-v2": "#c68cff",
-  DepthPro: "#ff8eba"
+  DepthPro: "#ff8eba",
+  "YOLO26-Depth": "#f5a45d",
+  YOLO26: "#f5a45d",
+  ZipDepth: "#e9dd6c"
 };
 
 const precisionOptions: { value: Precision; label: string }[] = [
@@ -205,6 +222,29 @@ function strictLabel(row: StrictRow) {
   return `${row.method} ${row.modelScale}`;
 }
 
+function fisheye(value: number, focus: number | null, distortion = 1.7) {
+  if (focus === null || value === focus) return value;
+  const left = value < focus;
+  const side = left ? focus : 1 - focus;
+  const distance = Math.abs(value - focus);
+  if (side <= 0 || distance <= 0) return value;
+  const magnified = side * (distortion + 1) / (distortion + side / distance);
+  return focus + (left ? -magnified : magnified);
+}
+
+function latencyPosition(value: number, range: { min: number; max: number }, focus: number | null) {
+  const low = range.min * 0.82;
+  const high = range.max * 1.22;
+  const normalized = Math.log(value / low) / Math.log(high / low);
+  return chart.left + fisheye(normalized, focus) * (chart.width - chart.left - chart.right);
+}
+
+function latencyAtFocus(range: { min: number; max: number }, focus: number) {
+  const low = range.min * 0.82;
+  const high = range.max * 1.22;
+  return low * Math.pow(high / low, focus);
+}
+
 function strictAnnotation(point: PlotPoint) {
   const key = `${point.encoder}-${point.resolution}`;
   const positions: Record<string, { x: number; y: number; anchor: "start" | "end" }> = {
@@ -229,6 +269,9 @@ export default function BenchmarkExplorer() {
   const [strictRows, setStrictRows] = useState<StrictRow[]>([]);
   const [active, setActive] = useState<string>("DepthART-S-S_224-NYUD");
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [lensFocus, setLensFocus] = useState<number | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const lensFrame = useRef<number | null>(null);
   const useStrict = platform === "a6000" && precision === "fp32";
 
   useEffect(() => {
@@ -291,7 +334,7 @@ export default function BenchmarkExplorer() {
         .filter((row) => family === "metric" ? row.method === "DepthART-Metric" : row.method !== "DepthART-Metric")
         .map((row) => {
           const isDepthART = row.method === "DepthART" || row.method === "DepthART-Metric";
-          const encoder = isDepthART && ["S", "B", "L"].includes(row.modelScale) ? row.modelScale as Encoder : undefined;
+          const encoder = isDepthART && encoderOrder.includes(row.modelScale as Encoder) ? row.modelScale as Encoder : undefined;
           const resolution = Number(row.speedInput.match(/\d+/)?.[0]);
           return {
             id: `${row.method}-${row.modelScale}-${row.variant}-${row.dataset}`,
@@ -357,14 +400,10 @@ export default function BenchmarkExplorer() {
 
   const plotPoints = useMemo<PlotPoint[]>(() => {
     if (!chartData.length) return [];
-    const low = latencyRange.min * 0.82;
-    const high = latencyRange.max * 1.22;
-    const plotWidth = chart.width - chart.left - chart.right;
     const plotHeight = chart.height - chart.top - chart.bottom;
-    const xPosition = (value: number) => chart.left + (Math.log(value / low) / Math.log(high / low)) * plotWidth;
     const yPosition = (value: number) => chart.top + ((accuracyRange.max - value) / (accuracyRange.max - accuracyRange.min)) * plotHeight;
-    return chartData.map((row) => ({ ...row, x: xPosition(row.latency), y: yPosition(row.accuracy) }));
-  }, [chartData, latencyRange, accuracyRange]);
+    return chartData.map((row) => ({ ...row, x: latencyPosition(row.latency, latencyRange, lensFocus), y: yPosition(row.accuracy) }));
+  }, [chartData, latencyRange, accuracyRange, lensFocus]);
 
   const activePoint = plotPoints.find((point) => point.id === active) ?? plotPoints[0];
   const activeFamilyPoints = useMemo(
@@ -378,6 +417,20 @@ export default function BenchmarkExplorer() {
   const datasetLabel = dataset === "NYUD" ? "NYUD v2" : "KITTI";
   const familyLabel = family === "relative" ? "Relative" : "Metric";
   const loading = status === "loading" || (useStrict ? !strictRows.length : !accuracyRows.length);
+  const lensX = lensFocus === null ? null : chart.left + lensFocus * (chart.width - chart.left - chart.right);
+  const lensLatency = lensFocus === null ? null : latencyAtFocus(latencyRange, lensFocus);
+  const additionalComparisonFamilies = [
+    {
+      label: "YOLO26-Depth",
+      className: "family-yolo",
+      point: plotPoints.find((point) => point.methodFamily === "YOLO26-Depth")
+    },
+    {
+      label: "ZipDepth",
+      className: "family-zipdepth",
+      point: plotPoints.find((point) => point.methodFamily === "ZipDepth")
+    }
+  ];
 
   function choosePlatform(next: Platform) {
     setPlatform(next);
@@ -387,6 +440,23 @@ export default function BenchmarkExplorer() {
   function choosePower(next: PowerMode) {
     setPower(next);
     if (!supports("orin", next, precision)) setPrecision("trt_fp16");
+  }
+
+  function moveLens(event: PointerEvent<SVGSVGElement>) {
+    const eventTarget = event.target;
+    if (eventTarget instanceof Element && eventTarget.closest(".interactive-point")) return;
+    const bounds = svgRef.current?.getBoundingClientRect();
+    if (!bounds) return;
+    const svgX = (event.clientX - bounds.left) / bounds.width * chart.width;
+    const next = Math.max(0, Math.min(1, (svgX - chart.left) / (chart.width - chart.left - chart.right)));
+    const softened = lensFocus === null ? next : lensFocus + (next - lensFocus) * 0.34;
+    if (lensFrame.current !== null) cancelAnimationFrame(lensFrame.current);
+    lensFrame.current = requestAnimationFrame(() => setLensFocus(softened));
+  }
+
+  function releaseLens() {
+    if (lensFrame.current !== null) cancelAnimationFrame(lensFrame.current);
+    lensFrame.current = requestAnimationFrame(() => setLensFocus(null));
   }
 
   return (
@@ -450,16 +520,22 @@ export default function BenchmarkExplorer() {
         <div className="chart-panel">
           {status === "error" && <div className="benchmark-message">The benchmark CSV could not be loaded.</div>}
           {loading && status !== "error" && <div className="benchmark-message">Loading benchmark data…</div>}
-          <svg className="interactive-chart" viewBox={`0 0 ${chart.width} ${chart.height}`} role="img" aria-label={`${familyLabel} depth accuracy on ${datasetLabel} and latency on ${platformLabel} using ${precisionLabel}`}>
+          <svg ref={svgRef} className={`interactive-chart ${lensFocus === null ? "" : "lens-active"}`} viewBox={`0 0 ${chart.width} ${chart.height}`} role="img" aria-label={`${familyLabel} depth accuracy on ${datasetLabel} and latency on ${platformLabel} using ${precisionLabel}`} onPointerMove={moveLens} onPointerLeave={releaseLens}>
+            {lensX !== null && lensLatency !== null && <g className="lens-guide" aria-hidden="true">
+              <rect className="lens-region" x={lensX - 60} y={chart.top} width="120" height={chart.height - chart.top - chart.bottom} />
+              <line x1={lensX} x2={lensX} y1={chart.top} y2={chart.height - chart.bottom} />
+              <g className="lens-value" transform={`translate(${lensX} ${chart.height - chart.bottom - 20})`}>
+                <rect x="-29" y="0" width="58" height="18" rx="5" />
+                <text x="0" y="12.5" textAnchor="middle">{formatLatency(lensLatency)} ms</text>
+              </g>
+            </g>}
             {yTicks.map((tick) => {
               const y = chart.top + ((accuracyRange.max - tick) / (accuracyRange.max - accuracyRange.min)) * (chart.height - chart.top - chart.bottom);
               return <g key={tick}><line className="chart-grid" x1={chart.left} x2={chart.width - chart.right} y1={y} y2={y} /><text className="chart-tick" x={chart.left - 14} y={y + 4} textAnchor="end">{tick.toFixed(3)}</text></g>;
             })}
             {xTicks.map((tick) => {
-              const low = latencyRange.min * 0.82;
-              const high = latencyRange.max * 1.22;
-              const x = chart.left + (Math.log(tick / low) / Math.log(high / low)) * (chart.width - chart.left - chart.right);
-              return <g key={tick}><line className="chart-grid vertical" x1={x} x2={x} y1={chart.top} y2={chart.height - chart.bottom} /><text className="chart-tick" x={x} y={chart.height - chart.bottom + 23} textAnchor="middle">{formatLatency(tick)}</text></g>;
+              const x = latencyPosition(tick, latencyRange, lensFocus);
+              return <g key={tick} className="x-tick" style={{ transform: `translateX(${x}px)` }}><line className="chart-grid vertical" x1="0" x2="0" y1={chart.top} y2={chart.height - chart.bottom} /><text className="chart-tick" x="0" y={chart.height - chart.bottom + 23} textAnchor="middle">{formatLatency(tick)}</text></g>;
             })}
             <line className="chart-axis" x1={chart.left} x2={chart.width - chart.right} y1={chart.height - chart.bottom} y2={chart.height - chart.bottom} />
             <line className="chart-axis" x1={chart.left} x2={chart.left} y1={chart.top} y2={chart.height - chart.bottom} />
@@ -478,16 +554,23 @@ export default function BenchmarkExplorer() {
               const selected = activePoint?.id === point.id;
               const familySelected = activePoint?.methodFamily === point.methodFamily;
               const diamond = point.isDepthART && point.resolution === 448;
+              const isAddedComparison = point.methodFamily === "YOLO26-Depth" || point.methodFamily === "ZipDepth";
+              const isZipDepth = point.methodFamily === "ZipDepth";
               const compact = useStrict;
-              const liftedLabel = useStrict && point.isDepthART;
+              const hideDenseDepthARTLabel = useStrict && family === "relative" && point.isDepthART;
+              const liftedLabel = useStrict && point.isDepthART && !hideDenseDepthARTLabel;
+              const showPointLabel = !isZipDepth && !hideDenseDepthARTLabel && (point.isDepthART || selected);
               const annotation = strictAnnotation(point);
               return (
-                <g key={point.id} className={`interactive-point ${selected ? "selected" : ""} ${familySelected ? "family-highlighted" : "family-muted"}`} style={{ transform: `translate(${point.x}px, ${point.y}px)` }} tabIndex={0} role="button" aria-label={`${point.label}, ${point.resolutionLabel}, ${point.accuracy.toFixed(4)} delta one, ${point.latency.toFixed(3)} milliseconds, ${point.fps.toFixed(1)} FPS`} onMouseEnter={() => setActive(point.id)} onFocus={() => setActive(point.id)} onClick={() => setActive(point.id)}>
+                <g key={point.id} className={`interactive-point ${isAddedComparison ? "added-comparison" : ""} ${selected ? "selected" : ""} ${familySelected ? "family-highlighted" : "family-muted"}`} style={{ transform: `translate(${point.x}px, ${point.y}px)` }} tabIndex={0} role="button" aria-label={`${point.label}, ${point.resolutionLabel}, ${point.accuracy.toFixed(4)} delta one, ${point.latency.toFixed(3)} milliseconds, ${point.fps.toFixed(1)} FPS`} onMouseEnter={() => setActive(point.id)} onFocus={() => setActive(point.id)} onClick={() => setActive(point.id)}>
+                  <circle className="point-hit-target" r={isAddedComparison ? 18 : compact ? 15 : 18} fill="transparent" stroke="transparent" />
                   {liftedLabel && <line className="point-label-leader" x1="0" y1="-8" x2={annotation.x} y2={annotation.y + 6} stroke={point.color} />}
-                  {diamond
+                  {isZipDepth
+                    ? <rect className="comparison-marker zipdepth-marker" x={selected ? -7 : -5.5} y={selected ? -7 : -5.5} width={selected ? 14 : 11} height={selected ? 14 : 11} rx="2.5" fill={point.color} stroke="#071d42" strokeWidth="1.5" />
+                    : diamond
                     ? <path d={compact ? (selected ? "M 0 -10 L 10 0 L 0 10 L -10 0 Z" : "M 0 -7 L 7 0 L 0 7 L -7 0 Z") : (selected ? "M 0 -14 L 14 0 L 0 14 L -14 0 Z" : "M 0 -10 L 10 0 L 0 10 L -10 0 Z")} fill="#071d42" stroke={point.color} strokeWidth={compact ? "3" : "4"} />
-                    : <circle r={compact ? (selected ? 8 : point.isDepthART ? 6 : 4.5) : (selected ? 11 : point.isDepthART ? 8 : 6)} fill={point.color} />}
-                  {(point.isDepthART || selected) && <text x={liftedLabel ? annotation.x : 13} y={liftedLabel ? annotation.y : -11} textAnchor={liftedLabel ? annotation.anchor : "start"} fill={point.color}>{point.pointLabel}</text>}
+                    : <circle r={compact ? (selected ? 8 : point.isDepthART ? 6 : isAddedComparison ? 5.5 : 4.5) : (selected ? 11 : point.isDepthART ? 8 : 6)} fill={point.color} />}
+                  {showPointLabel && <text x={liftedLabel ? annotation.x : 13} y={liftedLabel ? annotation.y : -11} textAnchor={liftedLabel ? annotation.anchor : "start"} fill={point.color}>{point.pointLabel}</text>}
                 </g>
               );
             })}
@@ -514,8 +597,30 @@ export default function BenchmarkExplorer() {
         </aside>
       </div>
 
+      {useStrict && family === "relative" && <div className="benchmark-comparison-status" aria-label="Additional comparison family status">
+        <strong>Additional comparison families</strong>
+        {additionalComparisonFamilies.map((item) => (
+          <button
+            type="button"
+            key={item.label}
+            className={`${item.className} ${activePoint?.methodFamily === item.label ? "active" : ""}`}
+            disabled={!item.point}
+            aria-pressed={activePoint?.methodFamily === item.label}
+            onClick={() => item.point && setActive(item.point.id)}
+            title={item.point ? `Highlight ${item.label} in the current plot` : `${item.label} is unavailable for this dataset`}
+          >
+            <i />{item.label}
+          </button>
+        ))}
+        <em>{additionalComparisonFamilies.every((item) => item.point) ? "Included in the A6000 FP32 plot" : "Awaiting aligned A6000 FP32 model-only latency"}</em>
+      </div>}
+
       <div className="benchmark-footnote">
-        <span>DepthART scale: <i style={{ background: modelColors.S }} /> S <i style={{ background: modelColors.B }} /> B <i style={{ background: modelColors.L }} /> L</span>
+        <div className="benchmark-encoder-legend">
+          <strong>DepthART encoder</strong>
+          {encoderOrder.map((encoder) => <span key={encoder}><i style={{ background: modelColors[encoder] }} />{encoderLabels[encoder]}</span>)}
+        </div>
+        <span className="fisheye-hint">Move across the plot to magnify nearby latency values.</span>
         {useStrict && family === "relative" && <span>Comparison methods use affine-invariant δ1.</span>}
       </div>
     </section>

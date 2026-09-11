@@ -51,13 +51,17 @@ export default function Showcase() {
             <a className="button-light" href="https://github.com/xuefeng-cvr/DepthART" target="_blank" rel="noreferrer"><GitHubIcon /> Code</a>
             <a className="button-light" href="https://huggingface.co/Fengxue93/DepthART/tree/main" target="_blank" rel="noreferrer"><Icon>🤗</Icon> Models</a>
           </div>
+          <div className="release-update">
+            <span><b aria-hidden="true">🔥</b> New · September 2026</span>
+            <p>DepthART now supports <strong>MobileNetV4</strong> backbones for earlier-generation, resource-constrained devices. <strong>MobileNetV4-M-slim-SPF</strong> pairs a slimmer encoder with Single-Path Pyramid Fusion for portable BPU/NPU deployment.</p>
+          </div>
         </div>
         <div className="kpi-strip" aria-label="DepthART highlights">
           {[
             ["6.0M / 8.0M", "Relative-S / Metric-S parameters", "◫"],
             ["0.92 ms", "DepthART-S 224 · A6000 TensorRT FP16", "◷"],
             ["1088.9", "DepthART-S 224 · A6000 FPS · TensorRT FP16", "↯"],
-            ["247.8 / 15.2", "Orin NX TensorRT FP16 / Nano FP32 FPS", "▧"],
+            ["247.8 FPS", "Orin NX · TensorRT FP16", "▧"],
             ["0.971 δ1", "DepthART-L · NYUD v2 zero-shot", "◎"]
           ].map(([value, label, icon]) => (
             <div className="kpi" key={label}><div className="kpi-icon">{icon}</div><div><strong>{value}</strong><span>{label}</span></div></div>
