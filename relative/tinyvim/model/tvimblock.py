@@ -7,7 +7,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.checkpoint as checkpoint
 from einops import rearrange, repeat
-from timm.models.layers import DropPath, trunc_normal_
+try:
+    from timm.layers import DropPath, trunc_normal_
+except ImportError:  # timm 0.6.x
+    from timm.models.layers import DropPath, trunc_normal_
 DropPath.__repr__ = lambda self: f"timm.DropPath({self.drop_prob})"
 try:
     import selective_scan_cuda

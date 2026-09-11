@@ -1,0 +1,13 @@
+model,resolution,dataset,samples,inference,affine_alignment,delta1,absrel,rmse,checkpoint
+MobileNetV4-S,224,NYUD,654,full-image aspect-ratio-preserving,per-image least-squares scale and shift,0.922,0.088,0.368,checkpoints/relative/depthart_relative_mnv4s_224.pth
+MobileNetV4-S,224,KITTI,652,affine-consistent sliding windows (224/64),per-image disparity scale and shift after overlap-only tile alignment,0.890,0.101,4.407,checkpoints/relative/depthart_relative_mnv4s_224.pth
+MobileNetV4-S,448,NYUD,654,full-image aspect-ratio-preserving,per-image least-squares scale and shift,0.934,0.082,0.344,checkpoints/relative/depthart_relative_mnv4s_448.pth
+MobileNetV4-S,448,KITTI,652,affine-consistent sliding windows (448/128),per-image disparity scale and shift after overlap-only tile alignment,0.910,0.091,3.965,checkpoints/relative/depthart_relative_mnv4s_448.pth
+MobileNetV4-M,224,NYUD,654,full-image aspect-ratio-preserving,per-image least-squares scale and shift,0.944,0.073,0.324,checkpoints/relative/depthart_relative_mnv4m_224.pth
+MobileNetV4-M,224,KITTI,652,affine-consistent sliding windows (224/64),per-image disparity scale and shift after overlap-only tile alignment,0.922,0.085,3.890,checkpoints/relative/depthart_relative_mnv4m_224.pth
+MobileNetV4-M,448,NYUD,654,full-image aspect-ratio-preserving,per-image least-squares scale and shift,0.953,0.067,0.296,checkpoints/relative/depthart_relative_mnv4m_448.pth
+MobileNetV4-M,448,KITTI,652,affine-consistent sliding windows (448/128),per-image disparity scale and shift after overlap-only tile alignment,0.931,0.080,3.651,checkpoints/relative/depthart_relative_mnv4m_448.pth
+MobileNetV4-M-slim-SPF,224,NYUD,654,full-image aspect-ratio-preserving,per-image least-squares scale and shift,0.942,0.073,0.326,checkpoints/relative/depthart_relative_mnv4m_slim_224.pth
+MobileNetV4-M-slim-SPF,224,KITTI,652,affine-consistent sliding windows (224/64),per-image disparity scale and shift after overlap-only tile alignment,0.920,0.085,3.966,checkpoints/relative/depthart_relative_mnv4m_slim_224.pth
+MobileNetV4-M-slim-SPF,448,NYUD,654,full-image aspect-ratio-preserving,per-image least-squares scale and shift,0.952,0.068,0.300,checkpoints/relative/depthart_relative_mnv4m_slim_448.pth
+MobileNetV4-M-slim-SPF,448,KITTI,652,affine-consistent sliding windows (448/128),per-image disparity scale and shift after overlap-only tile alignment,0.928,0.082,3.716,checkpoints/relative/depthart_relative_mnv4m_slim_448.pth

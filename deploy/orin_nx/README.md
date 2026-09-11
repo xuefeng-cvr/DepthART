@@ -26,11 +26,23 @@ docker run --rm --runtime nvidia nvcr.io/nvidia/pytorch:25.06-py3 \
   python3 -c 'import torch; print(torch.__version__, torch.cuda.get_device_name(0))'
 ```
 
-Clone the repository with Git LFS:
+Clone the source repository, then download checkpoints and ONNX graphs from
+[Hugging Face](https://huggingface.co/Fengxue93/DepthART). These model artifacts
+are intentionally not stored in GitHub or Git LFS.
 
 ```bash
+git clone https://github.com/xuefeng-cvr/DepthART.git
+cd DepthART
 git lfs install
 git lfs pull
+python3 -m pip install -U huggingface_hub
+hf download Fengxue93/DepthART \
+  --include "relative/**" \
+  --include "metric/**" \
+  --local-dir checkpoints
+hf download Fengxue93/DepthART \
+  --include "onnx/**" \
+  --local-dir deploy/shared
 sha256sum -c CHECKSUMS.sha256
 ```
 
@@ -119,7 +131,9 @@ bash deploy/orin_nx/benchmark.sh \
   --workspace-gb 4
 ```
 
-The workflow reuses the static ONNX graphs in `deploy/shared/onnx`, builds 18 Orin-local TensorRT engines, runs 36 model/backend combinations, and writes:
+The workflow uses the 12 TinyViM/metric ONNX graphs in `deploy/shared/onnx`,
+builds 18 Orin-local TensorRT engines, runs 36 model/backend combinations, and
+writes:
 
 ```text
 deploy/orin_nx/results/

@@ -1,0 +1,4 @@
+model,resolution,batch_size,precision,tf32,warmup,samples,model_only_ms,fps,end_to_end_ms,end_to_end_fps,peak_mib,parameters_m,gmac
+MobileNetV4-S,448x448,1,FP32,False,200,1000,2.305642,433.719,5.135423,194.726,21.823730,2.115161,3.883635
+MobileNetV4-M,448x448,1,FP32,False,200,1000,3.941871,253.687,6.793411,147.201,46.303711,8.552593,8.633370
+MobileNetV4-M-slim-SPF,448x448,1,FP32,False,200,1000,2.709020,369.137,5.638465,177.353,38.331543,6.054609,3.780059

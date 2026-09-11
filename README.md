@@ -16,7 +16,9 @@
   <a href="https://huggingface.co/Fengxue93/DepthART">
     <img src="https://img.shields.io/badge/Hugging_Face-Models-yellow?logo=huggingface&logoColor=black" alt="Hugging Face models">
   </a>
-  <img src="https://img.shields.io/badge/arXiv-Coming_Soon-b31b1b?logo=arxiv&logoColor=white" alt="arXiv coming soon">
+  <a href="https://arxiv.org/abs/2607.17099">
+    <img src="https://img.shields.io/badge/arXiv-2607.17099-b31b1b?logo=arxiv&logoColor=white" alt="arXiv 2607.17099">
+  </a>
 </p>
 
 <p>
@@ -32,7 +34,7 @@
 
 </div>
 
-## Overview
+## 🔎 Overview
 
 DepthART scales foundation monocular depth estimation to compact Small, Base,
 and Large models. The release supports both affine-invariant relative depth and
@@ -41,19 +43,31 @@ GPUs and Jetson Orin NX.
 
 | Task | Input | Output | Released variants |
 | --- | --- | --- | --- |
-| Relative depth | RGB image | Affine-invariant depth | S/B/L at 224 and 448 |
+| Relative depth | RGB image | Affine-invariant depth | TinyViM S/B/L and MobileNetV4 variants at 224 and 448 |
 | Metric depth | RGB image and camera intrinsics | Depth in meters | Indoor and outdoor S/B/L at 448 |
 | Deployment | Static model input | PyTorch or TensorRT inference | FP32/TF32, AMP, and FP16 |
 
-## Highlights
+## 📰 News
+
+- **September 2026:** We released the MobileNetV4-S and MobileNetV4-M DepthART
+  variants for deployment on legacy and resource-constrained mobile devices,
+  including earlier platforms using BPU or NPU accelerators. We also provide
+  MobileNetV4-M-slim-SPF, which prunes the MobileNetV4-M backbone and replaces
+  the DPT decoder with our computation-efficient Single-Path Pyramid Fusion
+  (SPF) decoder, offering a stronger balance between depth quality and inference
+  speed.
+
+## ✨ Highlights
 
 - Relative depth at 224x224 and 448x448 input resolutions.
+- TinyViM S/B/L, MobileNetV4-S/M, and MobileNetV4-M-slim-SPF encoders.
 - Indoor and outdoor metric-depth models with camera-intrinsics conditioning.
 - PyTorch FP32/TF32 and AMP inference.
 - TensorRT FP32 and FP16 deployment with a custom Selective Scan plugin.
 - Reproducible PC and Jetson Orin NX setup scripts.
 
-## To-do List
+<a id="to-do-list"></a>
+## 📋 To-do List
 
 The current public release provides inference, evaluation, and deployment code.
 Training code and reproducible training configurations are not included yet.
@@ -61,8 +75,9 @@ Training code and reproducible training configurations are not included yet.
 - [ ] Release the complete training code and reproducible training configurations.
 - [ ] Complete end-to-end testing on Jetson Nano and publish deployment instructions and benchmark results.
 - [ ] Release the DepthART mobile application.
+- [x] Add deployment-friendly MobileNetV4 DepthART variants.
 
-## Quick Links
+## 🔗 Quick Links
 
 - [Pretrained models](https://huggingface.co/Fengxue93/DepthART)
 - [Project page](https://xuefeng-cvr.github.io/DepthART/)
@@ -74,13 +89,13 @@ Training code and reproducible training configurations are not included yet.
 - [To-do list](#to-do-list)
 - [Citation](#citation)
 
-## Repository Layout
+## 🗂️ Repository Layout
 
 ```text
 DepthART/
 ├── assets/                   # README media
 ├── checkpoints/              # pretrained Relative and Metric models
-├── relative/                 # relative-depth inference and evaluation
+├── relative/                 # relative-depth models, inference, and evaluation
 ├── metric/                   # metric-depth inference and evaluation
 ├── deploy/
 │   ├── shared/
@@ -90,22 +105,26 @@ DepthART/
 │   ├── pc/                   # desktop/server NVIDIA GPU workflow
 │   └── orin_nx/              # Jetson Orin NX workflow
 ├── environment.yml           # reproducible PC Conda environment
-└── CHECKSUMS.sha256          # checkpoint checksums
+└── CHECKSUMS.sha256          # checkpoint and ONNX checksums
 ```
 
-## Models
+## 🧩 Models
 
 | Task | Domain | Scale | Input | Checkpoint |
 | --- | --- | --- | --- | --- |
 | Relative | general | S/B/L | 224x224 | `checkpoints/relative/depthart_relative_<s,b,l>_224.pth` |
 | Relative | general | S/B/L | 448x448 | `checkpoints/relative/depthart_relative_<s,b,l>_448.pth` |
+| Relative | general | MobileNetV4-S/M | 224x224 or 448x448 | `checkpoints/relative/depthart_relative_mnv4<s,m>_<224,448>.pth` |
+| Relative | general | MobileNetV4-M-slim-SPF | 224x224 or 448x448 | `checkpoints/relative/depthart_relative_mnv4m_slim_<224,448>.pth` |
 | Metric | indoor | S/B/L | 448 | `checkpoints/metric/depthart_metric_indoor_<s,b,l>_448.pth` |
 | Metric | outdoor | S/B/L | 448 | `checkpoints/metric/depthart_metric_outdoor_<s,b,l>_448.pth` |
 
-## Pretrained Checkpoints
+## 📦 Pretrained Checkpoints
 
 Pretrained Relative and Metric checkpoints are hosted in the
 [DepthART Hugging Face repository](https://huggingface.co/Fengxue93/DepthART).
+Model checkpoints and ONNX graphs are not stored in the GitHub repository;
+download them from Hugging Face after cloning the source code.
 
 Download the complete checkpoint directory into an existing source checkout:
 
@@ -125,7 +144,8 @@ The Hugging Face repository has three top-level model folders: `relative/`,
 `metric/`, and `onnx/`. The commands above place them directly at the runtime
 paths shown in the model table and under `deploy/shared/onnx/`, so no manual file
 moves are required. TensorRT engines are device-specific build artifacts and are
-not distributed as checkpoints.
+not distributed as checkpoints. `CHECKSUMS.sha256` covers all 18 checkpoints
+and all 18 ONNX graphs, including the six standard-operator MobileNetV4 graphs.
 
 Each checkpoint is an inference-only PyTorch payload with two top-level fields:
 `model` contains the model state dictionary, and `validation_metrics` contains
@@ -133,9 +153,10 @@ only the validation summaries available for that model. Checkpoints do not
 include optimizer state, training arguments, epochs, dataset split entries,
 image paths, or internal filesystem paths.
 
-## Installation
+<a id="installation"></a>
+## 🛠️ Installation
 
-### PC
+### 🖥️ PC
 
 The tested PC configuration is defined in [`environment.yml`](environment.yml): Python 3.9, PyTorch 2.1, and CUDA 11.8.
 
@@ -158,7 +179,7 @@ MAX_JOBS=4 bash deploy/pc/setup.sh
 
 The pip-only TensorRT package does not provide C++ headers, so it is insufficient for compiling the custom plugin. See [PC deployment](deploy/pc/README.md) for complete requirements and troubleshooting.
 
-### Jetson Orin NX
+### 🚀 Jetson Orin NX
 
 The recommended Orin NX environment uses JetPack 6.2 and NVIDIA's PyTorch 25.06 container. The exact container configuration is defined by [`deploy/orin_nx/Dockerfile`](deploy/orin_nx/Dockerfile).
 
@@ -188,11 +209,12 @@ MAX_JOBS=4 bash deploy/orin_nx/setup.sh
 
 Do not copy CUDA extensions or TensorRT engines from a PC. Both must be built on the Orin NX against its local CUDA, PyTorch, and TensorRT versions. Continue with [Orin NX deployment](deploy/orin_nx/README.md).
 
-## Inference
+<a id="inference"></a>
+## 🔮 Inference
 
 Both inference commands save a float32 NumPy depth map and a colorized PNG.
 
-### Relative Depth
+### 📐 Relative Depth
 
 ```bash
 python relative/infer_image.py \
@@ -205,7 +227,23 @@ python relative/infer_image.py \
 
 Relative predictions are affine-invariant and should not be interpreted as metric distance.
 
-### Metric Depth
+MobileNetV4 models use the same command with one of `MNV4-S`, `MNV4-M`, or
+`MNV4-M-SLIM-SPF`:
+
+```bash
+python relative/infer_image.py \
+  --image assets/example.png \
+  --encoder MNV4-M-SLIM-SPF \
+  --resolution 448 \
+  --checkpoint checkpoints/relative/depthart_relative_mnv4m_slim_448.pth \
+  --output outputs/relative_mnv4m_slim_448.npy
+```
+
+The released MobileNetV4 variants support PyTorch inference and portable,
+standard-operator ONNX export. The TensorRT benchmark matrix and custom
+Selective Scan plugin apply to the TinyViM S/B/L models.
+
+### 📏 Metric Depth
 
 Metric inference requires camera intrinsics in the order `fx fy cx cy`:
 
@@ -221,7 +259,8 @@ python metric/infer_image.py \
 
 Use an indoor checkpoint for indoor cameras and an outdoor checkpoint for outdoor scenes. Intrinsics must correspond to the original input image; preprocessing scales them together with the image.
 
-## Dataset Evaluation
+<a id="dataset-evaluation"></a>
+## 🧪 Dataset Evaluation
 
 Set `DEPTHART_DATA_ROOT` to the directory containing the supported zero-shot datasets:
 
@@ -230,15 +269,36 @@ export DEPTHART_DATA_ROOT=/path/to/Zero_shot_Datasets
 python deploy/shared/evaluate_depth.py --output-dir outputs/evaluation
 ```
 
-Relative evaluation performs per-image scale-and-shift alignment. Metric evaluation uses absolute depth without alignment. The evaluation script supports NYUD and KITTI for all released S/B/L variants.
+Relative evaluation performs per-image scale-and-shift alignment. Metric evaluation uses absolute depth without alignment. The deployment evaluator supports NYUD and KITTI for all released TinyViM S/B/L variants.
 
-## Results
+MobileNetV4 checkpoints can be evaluated directly with the relative-depth evaluator:
 
-### Depth Accuracy
+```bash
+cd relative
+python infer_dataset.py \
+  --encoder MNV4-M --input_height 448 --input_width 448 \
+  --pretrained_from ../checkpoints/relative/depthart_relative_mnv4m_448.pth \
+  --eval_datasets NYU KITTI \
+  --kitti-tiled --tile-stride 128 \
+  --path-map /path/to/Zero_shot_Datasets="$DEPTHART_DATA_ROOT" \
+  --output-json ../outputs/mnv4m_448.json
+```
+
+KITTI is resized with aspect ratio preserved and evaluated with square
+horizontal windows. The windows are jointly scale-and-shift aligned from their
+overlaps only, blended with a Hann window, and then evaluated with one
+per-image disparity affine alignment inside the Eigen crop. Use window/stride
+`448/128` for 448 checkpoints and `224/64` for 224 checkpoints. Ground truth is
+never used to stitch the windows.
+
+<a id="results"></a>
+## 📊 Results
+
+### 🎯 Depth Accuracy
 
 Relative-depth results use per-image affine scale-and-shift alignment on the valid ground-truth mask. Metric-depth results use absolute depth without alignment; NYUD uses the indoor checkpoint and KITTI uses the outdoor checkpoint. `delta1` is higher-is-better, while AbsRel and RMSE are lower-is-better.
 
-#### Relative Depth
+#### 📐 Relative Depth
 
 | Model | Dataset | Actual input | TF32 delta1 | TF32 AbsRel | TRT FP32 delta1 | TRT FP32 AbsRel | TRT FP16 delta1 | TRT FP16 AbsRel |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -257,7 +317,102 @@ Relative-depth results use per-image affine scale-and-shift alignment on the val
 
 Relative-L-224 TensorRT FP16 keeps the final depth prediction head in FP32. This avoids input-dependent FP16 overflow in the released checkpoint while retaining FP16 execution for the backbone and decoder.
 
-#### Metric Depth
+The released MobileNetV4 checkpoints use affine-consistent tiled KITTI
+inference. NYUD uses the native full-image path. All numbers below were
+reproduced on the complete 654-image NYUD and 652-image KITTI splits:
+
+| Model | Input | NYUD delta1 | NYUD AbsRel | KITTI delta1 | KITTI AbsRel |
+| --- | --- | ---: | ---: | ---: | ---: |
+| MobileNetV4-S | 224 | 0.922 | 0.088 | 0.890 | 0.101 |
+| MobileNetV4-S | 448 | 0.934 | 0.082 | 0.910 | 0.091 |
+| MobileNetV4-M | 224 | 0.944 | 0.073 | 0.922 | 0.085 |
+| MobileNetV4-M | 448 | 0.953 | 0.067 | 0.931 | 0.080 |
+| MobileNetV4-M-slim-SPF | 224 | 0.942 | 0.073 | 0.920 | 0.085 |
+| MobileNetV4-M-slim-SPF | 448 | 0.952 | 0.068 | 0.928 | 0.082 |
+
+The complete records are in [`mobilenetv4_relative_accuracy.csv`](deploy/pc/results/a6000/mobilenetv4_relative_accuracy.csv).
+
+##### 🆕 Latest Tiny Depth Model Comparison (September 2026)
+
+All entries use per-image affine alignment in disparity space. Each cell is
+`delta1 / AbsRel` (higher/lower is better). TinyViM rows are the reported
+DepthART results, while the other rows were evaluated over every image in each
+listed split.
+
+| Model | NYUD | KITTI | ETH3D | DDAD | DIODE |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| DepthAnything V2-S [[1]](#tiny-model-ref-1) | **0.974 / 0.051** | **0.944 / 0.077** | **0.964 / 0.065** | **0.921 / 0.085** | 0.756 / 0.207 |
+| YOLO26-N-Depth [[2]](#tiny-model-ref-2) | 0.875 / 0.112 | 0.767 / 0.158 | 0.876 / 0.121 | 0.793 / 0.168 | 0.718 / 0.221 |
+| YOLO26-S-Depth [[2]](#tiny-model-ref-2) | 0.887 / 0.108 | 0.789 / 0.151 | 0.878 / 0.118 | 0.777 / 0.174 | 0.718 / 0.218 |
+| YOLO26-M-Depth [[2]](#tiny-model-ref-2) | 0.931 / 0.087 | 0.838 / 0.135 | 0.910 / 0.102 | 0.829 / 0.150 | 0.756 / 0.201 |
+| YOLO26-L-Depth [[2]](#tiny-model-ref-2) | 0.939 / 0.082 | 0.863 / 0.118 | 0.915 / 0.099 | 0.833 / 0.150 | **0.768 / 0.192** |
+| YOLO26-X-Depth [[2]](#tiny-model-ref-2) | 0.943 / 0.079 | 0.847 / 0.124 | 0.932 / 0.089 | 0.840 / 0.143 | 0.766 / 0.193 |
+| ZipDepth Base [[3]](#tiny-model-ref-3) | 0.935 / 0.082 | 0.881 / 0.114 | 0.927 / 0.101 | 0.892 / 0.102 | 0.731 / 0.224 |
+| DepthART MobileNetV4-S | 0.934 / 0.082 | 0.910 / 0.091<sup>SW</sup> | 0.906 / 0.112 | 0.860 / 0.123 | 0.714 / 0.226 |
+| DepthART MNv4-M | 0.953 / 0.067 | 0.931 / 0.080<sup>SW</sup> | 0.930 / 0.095 | 0.887 / 0.106 | 0.732 / 0.217 |
+| **DepthART MNv4-M-slim-SPF**⭐ | 0.952 / 0.068 | 0.928 / 0.082<sup>SW</sup> | 0.928 / 0.098 | 0.879 / 0.115 | 0.732 / 0.216 |
+| DepthART TinyViM-S | 0.964 / 0.059 | 0.930 / 0.082 | 0.950 / 0.084 | 0.900 / 0.095 | 0.745 / 0.214 |
+| DepthART TinyViM-B | 0.969 / 0.057 | 0.929 / 0.088 | 0.954 / 0.092 | 0.906 / 0.094 | 0.746 / 0.214 |
+| DepthART TinyViM-L | 0.971 / 0.053 | 0.933 / 0.079 | 0.958 / 0.091 | 0.910 / 0.095 | 0.754 / 0.208 |
+
+<sup>SW</sup> MobileNetV4 KITTI results use sliding-window inference. These
+backbones are sensitive to test-image aspect ratios that differ substantially
+from the training crops, so direct full-width inference can reduce accuracy.
+
+<a id="tiny-model-ref-1"></a>[1] Yang et al., [*Depth Anything V2*](https://arxiv.org/abs/2406.09414), 2024.<br>
+<a id="tiny-model-ref-2"></a>[2] Jocher et al., [*Ultralytics YOLO26: Unified Real-Time End-to-End Vision Models*](https://arxiv.org/abs/2606.03748), 2026.<br>
+<a id="tiny-model-ref-3"></a>[3] Tosi et al., [*ZipDepth: Bringing Lightweight Zero-Shot Monocular Depth Anywhere, on Any Device*](https://arxiv.org/abs/2607.08771), ECCV 2026.
+
+The unrounded D1, D2, D3, AbsRel, SqRel, RMSE, RMSE-log, log10, and SILog
+records are available in [`complete_depth_accuracy.csv`](deploy/pc/results/a6000/complete_depth_accuracy.csv).
+
+##### 🖼️ Qualitative Comparison
+
+Depth maps use the Spectral colormap (near is red, far is blue). Benchmark
+visualizations are affine-aligned to ground truth; in-the-wild outputs use the
+same per-image percentile normalization for every model. The displayed maps
+preserve the source aspect ratio; they are not forced to square inputs. The
+GMAC values use the conventional square reference tensor shown after `@`.
+ZipDepth uses `short=448` in this matched comparison, while its official
+default is `short=384` (approximately 3.31 GMAC at 384x384).
+
+| DepthAnything V2-S<br><sub>short=518, aspect ratio preserved · 24.79M params · 41.30 GMAC @ 518x518</sub> | YOLO26-L-Depth<br><sub>imgsz=768, letterboxed · 27.68M params · 78.50 GMAC @ 768x768</sub> | ZipDepth<br><sub>short=448, aspect ratio preserved · 6.14M params · 4.50 GMAC @ 448x448</sub> |
+| --- | --- | --- |
+| <img src="assets/comparison/kitti/depthanything-v2-s.jpg" width="100%"> | <img src="assets/comparison/kitti/yolo26-l-depth.jpg" width="100%"> | <img src="assets/comparison/kitti/zipdepth.jpg" width="100%"> |
+| DepthART TinyViM-S<br><sub>short=448, aspect ratio preserved · 6.03M params · 7.00 GMAC @ 448x448</sub> | DepthART MNv4-M<br><sub>448x448 sliding windows · 8.55M params · 8.63 GMAC/window</sub> | ⭐ **DepthART MNv4-M-slim-SPF**<br><sub>448x448 sliding windows · 6.05M params · 3.78 GMAC/window</sub> |
+| <img src="assets/comparison/kitti/depthart-tinyvim-s.jpg" width="100%"> | <img src="assets/comparison/kitti/depthart-mnv4-m.jpg" width="100%"> | <img src="assets/comparison/kitti/depthart-mnv4-m-slim-spf.jpg" width="100%"> |
+
+<p align="center"><sub>KITTI validation sample 000000048</sub></p>
+
+| DepthAnything V2-S<br><sub>short=518, aspect ratio preserved · 24.79M params · 41.30 GMAC @ 518x518</sub> | YOLO26-L-Depth<br><sub>imgsz=768, letterboxed · 27.68M params · 78.50 GMAC @ 768x768</sub> | ZipDepth<br><sub>short=448, aspect ratio preserved · 6.14M params · 4.50 GMAC @ 448x448</sub> |
+| --- | --- | --- |
+| <img src="assets/comparison/self-collection-001/depthanything-v2-s.jpg" width="100%"> | <img src="assets/comparison/self-collection-001/yolo26-l-depth.jpg" width="100%"> | <img src="assets/comparison/self-collection-001/zipdepth.jpg" width="100%"> |
+| DepthART TinyViM-S<br><sub>short=448, aspect ratio preserved · 6.03M params · 7.00 GMAC @ 448x448</sub> | DepthART MNv4-M<br><sub>short=448, aspect ratio preserved · 8.55M params · 8.63 GMAC @ 448x448</sub> | **DepthART MNv4-M-slim-SPF**<br><sub>short=448, aspect ratio preserved · 6.05M params · 3.78 GMAC @ 448x448</sub> |
+| <img src="assets/comparison/self-collection-001/depthart-tinyvim-s.jpg" width="100%"> | <img src="assets/comparison/self-collection-001/depthart-mnv4-m.jpg" width="100%"> | <img src="assets/comparison/self-collection-001/depthart-mnv4-m-slim-spf.jpg" width="100%"> |
+
+<p align="center"><sub>Self-collected sample 001</sub></p>
+
+| DepthAnything V2-S<br><sub>short=518 · 24.79M · 41.30 GMAC @ 518x518</sub> | YOLO26-L-Depth<br><sub>imgsz=768 · 27.68M · 78.50 GMAC @ 768x768</sub> | ZipDepth<br><sub>short=448 · 6.14M · 4.50 GMAC @ 448x448</sub> | DepthART TinyViM-S<br><sub>short=448 · 6.03M · 7.00 GMAC @ 448x448</sub> | DepthART MNv4-M<br><sub>short=448 · 8.55M · 8.63 GMAC @ 448x448</sub> | **DepthART MNv4-M-slim-SPF**<br><sub>short=448 · 6.05M · 3.78 GMAC @ 448x448</sub> |
+| --- | --- | --- | --- | --- | --- |
+| <img src="assets/comparison/self-collection-009/depthanything-v2-s.jpg" width="100%"> | <img src="assets/comparison/self-collection-009/yolo26-l-depth.jpg" width="100%"> | <img src="assets/comparison/self-collection-009/zipdepth.jpg" width="100%"> | <img src="assets/comparison/self-collection-009/depthart-tinyvim-s.jpg" width="100%"> | <img src="assets/comparison/self-collection-009/depthart-mnv4-m.jpg" width="100%"> | <img src="assets/comparison/self-collection-009/depthart-mnv4-m-slim-spf.jpg" width="100%"> |
+
+<p align="center"><sub>Self-collected sample 009</sub></p>
+
+| DepthAnything V2-S<br><sub>short=518, aspect ratio preserved · 24.79M params · 41.30 GMAC @ 518x518</sub> | YOLO26-L-Depth<br><sub>imgsz=768, letterboxed · 27.68M params · 78.50 GMAC @ 768x768</sub> | ZipDepth<br><sub>short=448, aspect ratio preserved · 6.14M params · 4.50 GMAC @ 448x448</sub> |
+| --- | --- | --- |
+| <img src="assets/comparison/self-collection-019/depthanything-v2-s.jpg" width="100%"> | <img src="assets/comparison/self-collection-019/yolo26-l-depth.jpg" width="100%"> | <img src="assets/comparison/self-collection-019/zipdepth.jpg" width="100%"> |
+| DepthART TinyViM-S<br><sub>short=448, aspect ratio preserved · 6.03M params · 7.00 GMAC @ 448x448</sub> | DepthART MNv4-M<br><sub>short=448, aspect ratio preserved · 8.55M params · 8.63 GMAC @ 448x448</sub> | **DepthART MNv4-M-slim-SPF**<br><sub>short=448, aspect ratio preserved · 6.05M params · 3.78 GMAC @ 448x448</sub> |
+| <img src="assets/comparison/self-collection-019/depthart-tinyvim-s.jpg" width="100%"> | <img src="assets/comparison/self-collection-019/depthart-mnv4-m.jpg" width="100%"> | <img src="assets/comparison/self-collection-019/depthart-mnv4-m-slim-spf.jpg" width="100%"> |
+
+<p align="center"><sub>Self-collected sample 019</sub></p>
+
+| DepthAnything V2-S<br><sub>short=518 · 24.79M · 41.30 GMAC @ 518x518</sub> | YOLO26-L-Depth<br><sub>imgsz=768 · 27.68M · 78.50 GMAC @ 768x768</sub> | ZipDepth<br><sub>short=448 · 6.14M · 4.50 GMAC @ 448x448</sub> | DepthART TinyViM-S<br><sub>short=448 · 6.03M · 7.00 GMAC @ 448x448</sub> | DepthART MNv4-M<br><sub>short=448 · 8.55M · 8.63 GMAC @ 448x448</sub> | **DepthART MNv4-M-slim-SPF**<br><sub>short=448 · 6.05M · 3.78 GMAC @ 448x448</sub> |
+| --- | --- | --- | --- | --- | --- |
+| <img src="assets/comparison/self-collection-029/depthanything-v2-s.jpg" width="100%"> | <img src="assets/comparison/self-collection-029/yolo26-l-depth.jpg" width="100%"> | <img src="assets/comparison/self-collection-029/zipdepth.jpg" width="100%"> | <img src="assets/comparison/self-collection-029/depthart-tinyvim-s.jpg" width="100%"> | <img src="assets/comparison/self-collection-029/depthart-mnv4-m.jpg" width="100%"> | <img src="assets/comparison/self-collection-029/depthart-mnv4-m-slim-spf.jpg" width="100%"> |
+
+<p align="center"><sub>Self-collected sample 029</sub></p>
+
+#### 📏 Metric Depth
 
 | Model | Dataset | Actual input | TF32 delta1 | TF32 RMSE (m) | TRT FP32 delta1 | TRT FP32 RMSE (m) | TRT FP16 delta1 | TRT FP16 RMSE (m) |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -270,11 +425,11 @@ Relative-L-224 TensorRT FP16 keeps the final depth prediction head in FP32. This
 
 The complete per-backend accuracy records, checkpoint paths, engine paths, sample counts, and evaluation protocols are available in [`backend_depth_metrics.csv`](deploy/pc/results/a6000/depth_eval/backend_depth_metrics.csv). Rounded PyTorch checkpoint results are retained in [`depth_metrics.csv`](deploy/pc/results/a6000/depth_eval/depth_metrics.csv).
 
-### A6000 Inference Performance
+### ⚡ A6000 Inference Performance
 
 The following results were measured on an NVIDIA RTX A6000 with batch size 1, 200 warm-up iterations, and 1000 timed samples. Model-only latency uses CUDA events and excludes image decoding, CPU preprocessing, host-to-device transfer, output transfer, and output resize. FPS is `1000 / model-only latency (ms)`. End-to-end latency is wall-clock time from a deterministic 640x480 RGB sample through CPU resize and normalization, host-to-device transfer, inference, device-to-host transfer, and depth resize back to 640x480.
 
-#### Relative Depth
+#### 📐 Relative Depth
 
 | Model | Backend | Model-only (ms) | FPS | E2E (ms) | Peak (MiB) |
 | --- | --- | ---: | ---: | ---: | ---: |
@@ -302,8 +457,11 @@ The following results were measured on an NVIDIA RTX A6000 with batch size 1, 20
 | L448 | PyTorch AMP | 4.641 | 215.5 | 7.571 | 162.4 |
 | L448 | TensorRT FP32 | 3.798 | 263.3 | 6.654 | 19.6 |
 | L448 | TensorRT FP16 | 2.133 | 468.8 | 4.980 | 19.6 |
+| MobileNetV4-S-448 | PyTorch FP32 (TF32 off) | 2.306 | 433.7 | 5.135 | 21.8 |
+| MobileNetV4-M-448 | PyTorch FP32 (TF32 off) | 3.942 | 253.7 | 6.793 | 46.3 |
+| MobileNetV4-M-slim-SPF-448 | PyTorch FP32 (TF32 off) | 2.709 | 369.1 | 5.638 | 38.3 |
 
-#### Metric Depth
+#### 📏 Metric Depth
 
 | Model | Backend | Model-only (ms) | FPS | E2E (ms) | Peak (MiB) |
 | --- | --- | ---: | ---: | ---: | ---: |
@@ -321,8 +479,9 @@ The following results were measured on an NVIDIA RTX A6000 with batch size 1, 20
 | L448 | TensorRT FP16 | 3.369 | 296.8 | 6.339 | 19.6 |
 
 Peak memory is `torch.cuda.max_memory_allocated()`. For TensorRT rows this only covers allocations visible to PyTorch and does not represent total engine or CUDA-context memory. The complete unrounded results, percentiles, software versions, validation fields, and artifact paths are available in [`summary.csv`](deploy/pc/results/a6000/summary.csv).
+The MobileNetV4 FP32 records are available in [`mobilenetv4_relative_speed.csv`](deploy/pc/results/a6000/mobilenetv4_relative_speed.csv).
 
-## Performance Benchmark
+## ⏱️ Performance Benchmark
 
 The benchmark covers PyTorch FP32/TF32, PyTorch AMP, TensorRT FP32, and TensorRT FP16. The formal protocol uses batch size 1, 200 warm-up iterations, and 1000 timed samples.
 
@@ -342,18 +501,20 @@ bash deploy/orin_nx/benchmark.sh \
 
 Benchmark stages can be resumed with `--stage build`, `--stage benchmark`, and `--stage summary`. See [`deploy/README.md`](deploy/README.md) for output layout and timing definitions.
 
-## Verify the Repository
+## ✅ Verify the Repository
 
 ```bash
 python verify_release.py --allow-build-artifacts
 ```
 
-This checks the checkpoint inventory, result tables, ONNX graphs, and custom
-Selective Scan nodes while allowing libraries produced locally by the setup
-scripts. Release maintainers should run `python verify_release.py` without the
-flag on a clean source tree before publishing.
+This checks both SHA256 manifests, the checkpoint inventory, result tables,
+ONNX graphs, and custom Selective Scan nodes while allowing libraries produced
+locally by the setup scripts. Release maintainers should run
+`python verify_release.py` without the flag on a clean source tree before
+publishing.
 
-## Citation
+<a id="citation"></a>
+## 📝 Citation
 
 If you find DepthART useful in your research, please consider citing:
 
@@ -365,3 +526,21 @@ If you find DepthART useful in your research, please consider citing:
   year      = {2026}
 }
 ```
+
+## ⚖️ License and Third-Party Notices
+
+Original DepthART materials authored by this project are released under the
+[Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/)
+(CC BY 4.0). This license applies only to material owned by the DepthART authors
+and does not relicense third-party code, models, weights, datasets, or assets.
+
+Some included or referenced materials use different terms. In particular,
+`metric/network/attention.py` is marked CC BY-NC 4.0; the vendored Selective
+Scan implementation retains its upstream copyright and license terms; and the
+DepthART checkpoints were trained using supervision generated with
+[Depth Anything V2-L](https://github.com/DepthAnything/Depth-Anything-V2),
+whose model weights are distributed under CC BY-NC 4.0. These
+materials are not covered by the DepthART CC BY 4.0 grant. Users must review
+and comply with all applicable third-party licenses, including restrictions on
+commercial use, before using or redistributing the corresponding code or
+weights. See [`LICENSE`](LICENSE) for the project license notice.
